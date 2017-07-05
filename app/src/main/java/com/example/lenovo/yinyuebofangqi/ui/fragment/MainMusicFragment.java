@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import com.example.lenovo.yinyuebofangqi.R;
 import com.example.lenovo.yinyuebofangqi.inject.component.DaggerMainMusicAdapterComponent;
 import com.example.lenovo.yinyuebofangqi.inject.module.MainMusicAdapterModule;
+import com.example.lenovo.yinyuebofangqi.presenter.contract.MusicMainContract;
+import com.example.lenovo.yinyuebofangqi.presenter.impl.MusicMainPresenter;
+import com.example.lenovo.yinyuebofangqi.ui.activity.MainActivity;
 import com.example.lenovo.yinyuebofangqi.ui.adapter.SongListAdapter;
 import com.example.lenovo.yinyuebofangqi.view.ScrollRecyclerLayoutManager;
 
@@ -28,7 +31,7 @@ import butterknife.Unbinder;
  * Created by lenovo on 2017/6/28.
  */
 
-public class MainMusicFragment extends BaseFragment {
+public class MainMusicFragment extends BaseFragment implements MusicMainContract.View {
     @BindView(R.id.music_main_fragment_card_local)
     CardView cardLocal;
     @BindView(R.id.music_main_fragment_card_remote)
@@ -46,6 +49,9 @@ public class MainMusicFragment extends BaseFragment {
     Unbinder unbinder;
 
     @Inject
+    MusicMainPresenter presenter;
+
+    @Inject
     SongListAdapter songListAdapter;
     ArrayList<String> list;
 
@@ -57,6 +63,7 @@ public class MainMusicFragment extends BaseFragment {
         unbinder = ButterKnife.bind(this, view);
         return view;
     }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -64,7 +71,7 @@ public class MainMusicFragment extends BaseFragment {
 
         DaggerMainMusicAdapterComponent
                 .builder()
-                .mainMusicAdapterModule(new MainMusicAdapterModule(getActivity(), list))
+                .mainMusicAdapterModule(new MainMusicAdapterModule(getActivity(), list,this))
                 .build()
                 .inject(this);
 
@@ -95,6 +102,7 @@ public class MainMusicFragment extends BaseFragment {
         list.add("超级女孩");
         return list;
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -104,14 +112,43 @@ public class MainMusicFragment extends BaseFragment {
 
     @OnClick({R.id.music_main_fragment_card_local, R.id.music_main_fragment_card_remote, R.id.music_main_fragment_card_download, R.id.music_main_fragment_card_lay, R.id.music_main_fragment_card_lately, R.id.music_main_fragment_card_like, R.id.music_main_fragment_card_recommend})
     public void onViewClicked(View view) {
+        int id=0;
         switch (view.getId()) {
             case R.id.music_main_fragment_card_local:
+                id=R.id.music_main_fragment_card_local;
                 break;
             case R.id.music_main_fragment_card_remote:
+                id=R.id.music_main_fragment_card_remote;
                 break;
             case R.id.music_main_fragment_card_download:
+                id=R.id.music_main_fragment_card_download;
                 break;
-            case R.id.music_main_fragment_card_lay:
+            case R.id.music_main_fragment_card_lately:
+                id=R.id.music_main_fragment_card_lately;
+                break;
+            case R.id.music_main_fragment_card_like:
+                id=R.id.music_main_fragment_card_like;
+                break;
+            case R.id.music_main_fragment_card_recommend:
+                id=R.id.music_main_fragment_card_recommend;
+                break;
+        }
+        presenter.cardEnvnt(id);
+    }
+
+
+    @Override
+    public void card2new(int id) {
+        ((MainActivity) getParentFragment().getActivity())
+                .intnet2local();
+        switch (id) {
+            case R.id.music_main_fragment_card_local:
+
+                break;
+            case R.id.music_main_fragment_card_remote:
+
+                break;
+            case R.id.music_main_fragment_card_download:
                 break;
             case R.id.music_main_fragment_card_lately:
                 break;
@@ -121,4 +158,8 @@ public class MainMusicFragment extends BaseFragment {
                 break;
         }
     }
-}
+        @Override
+        public void song2new () {
+
+        }
+    }

@@ -2,44 +2,18 @@ package com.example.lenovo.yinyuebofangqi.ui.activity;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.view.View;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.example.lenovo.yinyuebofangqi.R;
-import com.example.lenovo.yinyuebofangqi.inject.component.DaggerMainComponent;
-import com.example.lenovo.yinyuebofangqi.inject.module.MainModule;
 import com.example.lenovo.yinyuebofangqi.ui.fragment.BaseFragment;
-import com.example.lenovo.yinyuebofangqi.ui.fragment.MainLiveFragment;
-import com.example.lenovo.yinyuebofangqi.ui.fragment.MainMusicFragment;
-import com.example.lenovo.yinyuebofangqi.ui.fragment.MainVideoFragment;
-
-import java.util.ArrayList;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import com.example.lenovo.yinyuebofangqi.ui.fragment.MainFragment;
 
 public class MainActivity extends BaseActivity {
+    private MainFragment mainFragment;
 
-    @BindView(R.id.main_tablayout)
-    TabLayout mainTablayout;
-    @BindView(R.id.main_viewpager)
-    ViewPager mainViewpager;
-
-    private ArrayList<BaseFragment> fragments = new ArrayList<>();
-    @Inject
-    MainMusicFragment musicFragment;
-    @Inject
-    MainVideoFragment videoFragment;
-    @Inject
-    MainLiveFragment liveFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,23 +25,32 @@ public class MainActivity extends BaseActivity {
         }
         setContentView(R.layout.activity_main);
         //绑定当前页面根布局
-        ButterKnife.bind(this);
+//        ButterKnife.bind(this);
 
-        DaggerMainComponent
-                .builder()
-                .mainModule(new MainModule())
-                .build()
-                .inject(this);
+        setFragment();
+    }
 
-        //添加fragment到集合中
-        addFragment();
+    private void setFragment() {
+        mainFragment = new MainFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.main_pager, mainFragment);
+        transaction.commit();
+    }
 
-        // 设置viewpager
-        setViewpager();
+    public void intnet2local() {
+        Toast.makeText(this, "aaaaaaaaaa", Toast.LENGTH_SHORT).show();
+//        addFragment(new MainLiveFragment());
+    }
+
+    private void addFragment(BaseFragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.main_pager, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     // 设置状态栏透明状态
-    private void   setTranslucentStatus(boolean on) {
+    private void setTranslucentStatus(boolean on) {
         Window win = getWindow();
         WindowManager.LayoutParams winParams = win.getAttributes();
         final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
@@ -79,45 +62,4 @@ public class MainActivity extends BaseActivity {
         win.setAttributes(winParams);
     }
 
-    private void setViewpager() {
-        // 初始化 适配器
-        FragmentPagerAdapter fragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
-            @Override
-            public Fragment getItem(int position) {
-                return fragments.get(position);
-            }
-
-            @Override
-            public int getCount() {
-                return fragments.size();
-            }
-
-            //设置pager标题
-            @Override
-            public CharSequence getPageTitle(int position) {
-                // 获取 string.xml中的 StringArray的值
-                return getResources().getStringArray(R.array.fragment_list)[position];
-            }
-        };
-        // 给viewpager设置适配器
-        mainViewpager.setAdapter(fragmentPagerAdapter);
-        // 设置 tablayout和viewpager联动
-        mainTablayout.setupWithViewPager(mainViewpager);
-    }
-
-    private void addFragment() {
-        fragments.add(musicFragment);
-        fragments.add(videoFragment);
-        fragments.add(liveFragment);
-    }
-
-    @OnClick({R.id.main_tablayout, R.id.main_viewpager})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.main_tablayout:
-                break;
-            case R.id.main_viewpager:
-                break;
-        }
-    }
 }

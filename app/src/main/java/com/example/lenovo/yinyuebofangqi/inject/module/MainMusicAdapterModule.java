@@ -2,6 +2,8 @@ package com.example.lenovo.yinyuebofangqi.inject.module;
 
 import android.content.Context;
 
+import com.example.lenovo.yinyuebofangqi.presenter.contract.MusicMainContract;
+
 import java.util.ArrayList;
 
 import dagger.Module;
@@ -14,10 +16,19 @@ import dagger.Provides;
 public class MainMusicAdapterModule {
     Context context;
     ArrayList<String> list;
+    private MusicMainContract.View view;
 
-    public MainMusicAdapterModule(Context context, ArrayList<String> list) {
+    @Provides
+    MusicMainContract.View getMusicMainPresenter() {
+        return view;
+    }
+
+
+
+    public MainMusicAdapterModule(Context context, ArrayList<String> list, MusicMainContract.View view) {
         this.context = context;
         this.list = list;
+        this.view = view;
     }
 
     @Provides
